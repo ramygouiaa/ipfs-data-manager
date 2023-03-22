@@ -1,0 +1,26 @@
+{
+  "name": "ipfs-data-manager",
+  "version": "1.0.0",
+  "description": "service to upload and retrieve data to/from IPFS network",
+  "main": "index.mjs",
+  "scripts": {
+    "start": "node index.mjs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/ramygouiaa/ipfs-data-manager.git"
+  },
+  "keywords": [
+    "ipfs"
+  ],
+  "author": "Ramy Gouiaa",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/ramygouiaa/ipfs-data-manager/issues"
+  },
+  "homepage": "https://github.com/ramygouiaa/ipfs-data-manager#readme",
+  "dependencies": {
+    "express": "^4.18.2",
+    "ipfs-http-client": "^60.0.0"
+  }
+}
