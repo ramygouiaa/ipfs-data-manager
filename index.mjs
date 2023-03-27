@@ -25,7 +25,7 @@ async function uploadToIpfs(data) {
     return cid.toString();
 }
 
-// Add middleware to parse request body as JSON
+// Add middleware to parse request body as text
 app.use(express.text());
 
 // Route to retrieve data from ipfs by CID
@@ -46,7 +46,6 @@ app.get('/getdata', async (req, res) => {
 app.post('/uploadToIpfs', async (req, res) => {
   try {
     console.log(req.body);
-
     const cidOfData = await uploadToIpfs(req.body);
     // Return the CID hash
     res.send(cidOfData);
