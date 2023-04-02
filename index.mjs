@@ -1,5 +1,6 @@
 import express from 'express';
 import { create } from 'ipfs-http-client';
+import { nanoid } from 'nanoid'
 
 // Initialize Express app
 const app = express();
@@ -47,8 +48,12 @@ app.post('/uploadToIpfs', async (req, res) => {
   try {
     console.log(req.body);
     const cidOfData = await uploadToIpfs(req.body);
+    const nanoidId = nanoid(10);
     // Return the CID hash
-    res.send(cidOfData);
+    res.send({
+      docId:nanoidId,
+      cid:cidOfData
+    });
   } catch (error) {
     console.error(error);
     res.status(500).send('Error uploading to ipfs');
