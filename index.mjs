@@ -50,7 +50,7 @@ app.post('/uploadToIpfs', async (req, res) => {
     console.log(req.body);
     const { dataToUpload } = req.body;
     console.log(dataToUpload);
-    const cidOfData = await uploadToIpfs(dataToUpload);
+    const cidOfData = await uploadToIpfs(dataToUpload.encryptedDoc);
     const nanoidId = nanoid(10);
     // Return the CID hash
     res.send({
@@ -61,6 +61,21 @@ app.post('/uploadToIpfs', async (req, res) => {
     console.error(error);
     res.status(500).send('Error uploading to ipfs');
   }
+});
+
+// Error handling middleware
+app.use(function(err, req, res, next) {
+  console.error(err.stack);
+  res.status(500).send('Something broke!');
+});
+
+// Process event listeners
+process.on('uncaughtException', function(err) {
+  console.error('Uncaught Exception:', err.stack);
+});
+
+process.on('unhandledRejection', function(reason, promise) {
+  console.error('Unhandled Rejection:', reason.stack || reason);
 });
 
 // Start the server
