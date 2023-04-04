@@ -38,7 +38,7 @@ app.get('/getdata', async (req, res) => {
     console.log(cid);
     // Call the getBirthAct function in the contract with the hash parameter
     const data = await retrieveDataFromIpfs(cid);
-    res.json(data);
+    res.json({data});
   } catch (error) {
     console.error(error);
     res.status(500).send('Error getting data from ipfs!');
@@ -50,7 +50,7 @@ app.post('/uploadToIpfs', async (req, res) => {
     console.log(req.body);
     const { dataToUpload } = req.body;
     console.log(dataToUpload);
-    const cidOfData = await uploadToIpfs(dataToUpload.encryptedDoc);
+    const cidOfData = await uploadToIpfs(dataToUpload);
     const nanoidId = nanoid(10);
     // Return the CID hash
     res.send({
