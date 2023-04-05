@@ -2,64 +2,36 @@ import express from 'express';
 import { create } from 'ipfs-http-client';
 import { nanoid } from 'nanoid'
 
-// Initialize Express app
 const app = express();
-
 const port = process.env.PORT || 4000;
+const ipfs = create({ url: "http://127.0.0.1:5001" });
 
-const client = create({ url: "http://127.0.0.1:5001" });
-
-const retrieveDataFromIpfs = async (cid) => {
-    const chunks = [];
-
-    for await (const chunk of client.cat(cid)) {
-      chunks.push(chunk);
-    }
-    const retrievedContent = Buffer.concat(chunks);
-    //console.log(retrievedContent.toString());
-    return retrievedContent.toString();
-}
-
-async function uploadToIpfs(data) {
-    const { cid } = await client.add(data);
-    console.log(`Data added with CID: ${cid.toString()}`);
-    return cid.toString();
-}
-
-// Add middleware to parse request body as text
+// Middleware to parse request body as text or JSON
 app.use(express.text());
 app.use(express.json());
 
-// Route to retrieve data from ipfs by CID
-app.get('/getdata', async (req, res) => {
+// GET endpoint to retrieve data from IPFS by CID
+app.get('/data/:cid', async (req, res) => {
   try {
-    // Get the birth act hash from the query string
-    const cid = req.query.cid;
-    console.log(cid);
-    // Call the getBirthAct function in the contract with the hash parameter
+    const { cid } = req.params;
     const data = await retrieveDataFromIpfs(cid);
-    res.json({data});
+    res.json({ data });
   } catch (error) {
     console.error(error);
-    res.status(500).send('Error getting data from ipfs!');
+    res.status(500).send('Error getting data from IPFS!');
   }
 });
 
-app.post('/uploadToIpfs', async (req, res) => {
+// POST endpoint to upload data to IPFS and get a CID
+app.post('/data', async (req, res) => {
   try {
-    console.log(req.body);
-    const { dataToUpload } = req.body;
-    console.log(dataToUpload);
-    const cidOfData = await uploadToIpfs(dataToUpload);
-    const nanoidId = nanoid(10);
-    // Return the CID hash
-    res.send({
-      docId:nanoidId,
-      cid:cidOfData
-    });
+    const { data } = req.body;
+    const cid = await uploadToIpfs(data);
+    const id = nanoid(10);
+    res.status(201).json({ id, cid });
   } catch (error) {
     console.error(error);
-    res.status(500).send('Error uploading to ipfs');
+    res.status(500).send('Error uploading data to IPFS');
   }
 });
 
@@ -78,8 +50,24 @@ process.on('unhandledRejection', function(reason, promise) {
   console.error('Unhandled Rejection:', reason.stack || reason);
 });
 
+// Functions to retrieve and upload data to IPFS
+async function retrieveDataFromIpfs(cid) {
+  const chunks = [];
+
+  for await (const chunk of ipfs.cat(cid)) {
+    chunks.push(chunk);
+  }
+  const retrievedContent = Buffer.concat(chunks);
+  return retrievedContent.toString();
+}
+
+async function uploadToIpfs(data) {
+  const { cid } = await ipfs.add(data);
+  console.log(`Data added with CID: ${cid.toString()}`);
+  return cid.toString();
+}
+
 // Start the server
 app.listen(port, () => {
-  console.log(`Ipfs manager server listening at http://localhost:${port}`);
+  console.log(`IPFS Manager Server listening at http://localhost:${port}`);
 });
-
